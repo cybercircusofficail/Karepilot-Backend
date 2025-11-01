@@ -24,7 +24,7 @@ import {
 } from "../../../validations/admin/adminUserSchemas";
 import { Permission } from "../../../models/admin";
 import { validate } from "../../../utils";
-import adminSettingsRouter from "./adminSettings";
+import adminSettingsRouter from "./settings/admin";
 
 const adminRouter = Router();
 

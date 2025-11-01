@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { AdminSettingsService } from '../../../services/admin/adminSettingsService';
+import { AdminSettingsService } from '../../../services/admin/settings/admin';
 
 export const getGeneralSettings = async (req: Request, res: Response) => {
   try {

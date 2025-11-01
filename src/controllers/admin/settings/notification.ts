@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { AdminSettingsService } from '../../../services/admin/adminSettingsService';
+import { AdminSettingsService } from '../../../services/admin/settings/admin';
 
 export const getNotificationSettings = async (req: Request, res: Response) => {
   try {

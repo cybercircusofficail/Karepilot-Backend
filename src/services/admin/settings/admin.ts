@@ -1,14 +1,14 @@
-import { AdminUser } from '../../models/admin';
-import { AdminGeneralSettings } from '../../models/admin/settings';
-import { AdminNotificationSettings } from '../../models/admin/settings';
-import { AdminSecuritySettings } from '../../models/admin/settings';
+import { AdminUser } from '../../../models/admin';
+import { AdminGeneralSettings } from '../../../models/admin/settings';
+import { AdminNotificationSettings } from '../../../models/admin/settings';
+import { AdminSecuritySettings } from '../../../models/admin/settings';
 import { 
   AdminPasswordChange,
   UpdateProfileRequest,
   UpdatePreferencesRequest,
   UpdateNotificationsRequest,
   UpdateSecurityRequest
-} from '../../types/admin/adminSettings';
+} from '../../../types/admin/settings/admin';
 
 export class AdminSettingsService {
   

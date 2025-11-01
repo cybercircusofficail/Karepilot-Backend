@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { authenticateAdmin } from "../../../middlewares/auth";
-import { validate } from "../../../utils";
+import { authenticateAdmin } from "../../../../middlewares/auth";
+import { validate } from "../../../../utils";
 import {
   getGeneralSettings,
   updateProfileSettings,
@@ -10,14 +10,14 @@ import {
   getSecuritySettings,
   updateSecuritySettings,
   changePassword,
-} from "../../../controllers/admin/settings";
+} from "../../../../controllers/admin/settings";
 import {
   adminProfileUpdateSchema,
   adminPreferencesUpdateSchema,
   adminNotificationSettingsSchema,
   adminSecuritySettingsSchema,
   adminPasswordChangeSchema,
-} from "../../../validations/admin/settings";
+} from "../../../../validations/admin/settings";
 
 const adminSettingsRouter = Router();
 
