@@ -7,7 +7,7 @@ import {
   getMobileProfile,
   updateMobileProfile,
   changeMobilePassword,
-} from "../../../controllers/mobile/user";
+} from "../../../controllers/mobile/mobileUser";
 import { authenticateMobile } from "../../../middlewares/auth";
 import {
   mobileUserRegistrationSchema,
@@ -16,7 +16,7 @@ import {
   mobilePasswordChangeSchema,
   emailVerificationSchema,
   resendVerificationSchema,
-} from "../../../validations/mobile/user";
+} from "../../../validations/mobile/mobileUser";
 import { validate } from "../../../utils";
 
 const mobileRouter = Router();

@@ -1,3 +1,3 @@
-export { default as MobileUser } from './user';
-export type { IMobileUser, MobileUserStatus } from '../../types/mobile/user';
+export { default as MobileUser } from './mobileUser';
+export type { IMobileUser, MobileUserStatus } from '../../types/mobile/mobileUser';
 

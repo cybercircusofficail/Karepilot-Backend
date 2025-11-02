@@ -10,7 +10,7 @@ import {
   VerificationResponse,
   IMobileUser,
   MobileUserStatus,
-} from "../../types/mobile/user";
+} from "../../types/mobile/mobileUser";
 
 export class MobileUserService {
   async createMobileUser(data: CreateMobileUserData): Promise<MobileUserResult> {

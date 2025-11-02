@@ -1,2 +1,2 @@
-export { default as mobileUserService } from './user';
+export { default as mobileUserService } from './mobileUser';
 
