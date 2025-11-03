@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { usersService } from "../../../services/admin/user-management";
+import { formatTimeAgo } from "../../../utils";
 
 export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -30,6 +31,8 @@ export const getAllUsers = async (req: Request, res: Response): Promise<void> =>
           profileImage: user.profileImage,
           isActive: user.isActive,
           lastLogin: user.lastLogin,
+          lastActive: user.lastLogin ? formatTimeAgo(user.lastLogin) : "Never",
+          currentLocation: user.currentLocation || "ICU Level 3",
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
         })),
@@ -66,6 +69,8 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
           profileImage: user.profileImage,
           isActive: user.isActive,
           lastLogin: user.lastLogin,
+          lastActive: user.lastLogin ? formatTimeAgo(user.lastLogin) : "Never",
+          currentLocation: user.currentLocation || null,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
         },
@@ -133,6 +138,8 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
           profileImage: user.profileImage,
           isActive: user.isActive,
           lastLogin: user.lastLogin,
+          lastActive: user.lastLogin ? formatTimeAgo(user.lastLogin) : "Never",
+          currentLocation: user.currentLocation || null,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
         },

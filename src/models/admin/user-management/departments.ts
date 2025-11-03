@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
+import AdminUser from "./users";
 
 export interface IDepartment extends Document {
   name: string;
@@ -33,9 +34,15 @@ const departmentSchema = new Schema<IDepartment>(
   }
 );
 
+departmentSchema.methods.getUserCount = async function () {
+  return await AdminUser.countDocuments({ 
+    department: this._id, 
+    isActive: true 
+  });
+};
+
 departmentSchema.index({ isActive: 1 });
 
 const Department = mongoose.model<IDepartment>("Department", departmentSchema);
 
 export default Department;
-

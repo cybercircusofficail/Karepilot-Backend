@@ -16,6 +16,7 @@ export interface IAdminUser extends Document {
   profileImage?: string;
   isActive: boolean;
   lastLogin?: Date;
+  currentLocation?: string; 
   createdAt: Date;
   updatedAt: Date;
 
@@ -88,6 +89,11 @@ const adminUserSchema = new Schema<IAdminUser>(
     },
     lastLogin: {
       type: Date,
+    },
+    currentLocation: {
+      type: String,
+      trim: true,
+      default: "ICU Level 3",
     },
   },
   {

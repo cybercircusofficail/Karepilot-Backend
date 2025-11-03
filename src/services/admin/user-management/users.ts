@@ -7,7 +7,7 @@ export class UsersService {
     const page = query.page || 1;
     const limit = query.limit || 10;
 
-    const dbQuery: any = { isActive: true };
+    const dbQuery: any = {};
 
     if (query.role) {
       dbQuery.role = query.role;
@@ -28,6 +28,8 @@ export class UsersService {
 
     if (query.isActive !== undefined) {
       dbQuery.isActive = query.isActive;
+    } else {
+      dbQuery.isActive = true;
     }
 
     const skip = (page - 1) * limit;

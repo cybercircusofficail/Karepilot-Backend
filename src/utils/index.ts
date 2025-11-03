@@ -6,3 +6,5 @@ export {
   refreshToken,
   validate
 } from './auth';
+
+export { formatTimeAgo } from './timeFormatter';

@@ -63,7 +63,8 @@ export const createUserSchema = Joi.object({
     }),
   phoneNumber: Joi.string().trim().optional(),
   badgeNumber: Joi.string().trim().optional(),
-  shift: Joi.string().trim().optional()
+  shift: Joi.string().trim().optional(),
+  currentLocation: Joi.string().trim().optional()
 });
 
 export const updateUserSchema = Joi.object({
@@ -119,7 +120,8 @@ export const updateUserSchema = Joi.object({
   badgeNumber: Joi.string().trim().optional(),
   shift: Joi.string().trim().optional(),
   profileImage: Joi.string().trim().optional(),
-  isActive: Joi.boolean().optional()
+  isActive: Joi.boolean().optional(),
+  currentLocation: Joi.string().trim().optional()
 });
 
 export const userQuerySchema = Joi.object({

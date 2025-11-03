@@ -147,11 +147,9 @@ export const adminGeneralSettingsSchema = Joi.object({
     .allow('', null)
     .optional()
     .custom((value, helpers) => {
-      // If empty string or null, allow it
       if (!value || value === '') {
         return value;
       }
-      // If value exists, validate it's a URI
       try {
         new URL(value);
         return value;
