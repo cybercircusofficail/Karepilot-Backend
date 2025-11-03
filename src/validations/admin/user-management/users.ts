@@ -1,11 +1,18 @@
 import Joi from 'joi';
-import { AdminRole } from '../../../models/admin/user-management';
+import { AdminRole, UserStatus } from '../../../models/admin/user-management';
 
 const roleSchema = Joi.string()
   .valid(...Object.values(AdminRole))
   .optional()
   .messages({
     'any.only': 'Invalid role specified. Must be one of: Admin, Manager, Technician, Staff, Security, Viewer'
+  });
+
+const statusSchema = Joi.string()
+  .valid(...Object.values(UserStatus))
+  .optional()
+  .messages({
+    'any.only': 'Invalid status specified. Must be one of: active, pending, inactive'
   });
 
 export const createUserSchema = Joi.object({
@@ -64,7 +71,8 @@ export const createUserSchema = Joi.object({
   phoneNumber: Joi.string().trim().optional(),
   badgeNumber: Joi.string().trim().optional(),
   shift: Joi.string().trim().optional(),
-  currentLocation: Joi.string().trim().optional()
+  currentLocation: Joi.string().trim().optional(),
+  status: statusSchema
 });
 
 export const updateUserSchema = Joi.object({
@@ -121,7 +129,8 @@ export const updateUserSchema = Joi.object({
   shift: Joi.string().trim().optional(),
   profileImage: Joi.string().trim().optional(),
   isActive: Joi.boolean().optional(),
-  currentLocation: Joi.string().trim().optional()
+  currentLocation: Joi.string().trim().optional(),
+  status: statusSchema
 });
 
 export const userQuerySchema = Joi.object({
@@ -130,7 +139,8 @@ export const userQuerySchema = Joi.object({
   role: roleSchema,
   department: Joi.string().trim().optional(),
   search: Joi.string().trim().optional(),
-  isActive: Joi.boolean().optional()
+  isActive: Joi.boolean().optional(),
+  status: statusSchema
 });
 
 export const userIdParamSchema = Joi.object({

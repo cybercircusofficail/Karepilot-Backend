@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { usersService } from "../../../services/admin/user-management";
 import { formatTimeAgo } from "../../../utils";
+import { UserStatus } from "../../../models/admin/user-management";
 
 export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -10,6 +11,7 @@ export const getAllUsers = async (req: Request, res: Response): Promise<void> =>
     if (req.query.role) query.role = req.query.role;
     if (req.query.department) query.department = req.query.department as string;
     if (req.query.search) query.search = req.query.search as string;
+    if (req.query.status) query.status = req.query.status as string;
     if (req.query.isActive !== undefined) query.isActive = req.query.isActive === 'true';
 
     const result = await usersService.getAllUsers(query);
@@ -32,7 +34,8 @@ export const getAllUsers = async (req: Request, res: Response): Promise<void> =>
           isActive: user.isActive,
           lastLogin: user.lastLogin,
           lastActive: user.lastLogin ? formatTimeAgo(user.lastLogin) : "Never",
-          currentLocation: user.currentLocation || "ICU Level 3",
+          currentLocation: user.currentLocation || null,
+          status: user.status || UserStatus.PENDING,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
         })),
@@ -71,6 +74,7 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
           lastLogin: user.lastLogin,
           lastActive: user.lastLogin ? formatTimeAgo(user.lastLogin) : "Never",
           currentLocation: user.currentLocation || null,
+          status: user.status || UserStatus.PENDING,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
         },
@@ -140,6 +144,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
           lastLogin: user.lastLogin,
           lastActive: user.lastLogin ? formatTimeAgo(user.lastLogin) : "Never",
           currentLocation: user.currentLocation || null,
+          status: user.status || UserStatus.PENDING,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
         },
@@ -149,6 +154,23 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
     res.status(400).json({
       success: false,
       message: error.message || "Error updating user",
+    });
+  }
+};
+
+export const getUsersStats = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const stats = await usersService.getUsersStats();
+
+    res.status(200).json({
+      success: true,
+      message: "Users statistics retrieved successfully",
+      data: stats,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || "Error retrieving users statistics",
     });
   }
 };

@@ -1,4 +1,4 @@
-import { AdminRole } from '../../../models/admin/user-management';
+import { AdminRole, UserStatus } from '../../../models/admin/user-management';
 import { IAdminUser } from '../../../models/admin/user-management/users';
 
 export interface CreateUserData {
@@ -11,6 +11,7 @@ export interface CreateUserData {
   phoneNumber?: string;
   badgeNumber?: string;
   shift?: string;
+  status?: UserStatus;
 }
 
 export interface UpdateUserData {
@@ -25,6 +26,7 @@ export interface UpdateUserData {
   shift?: string;
   profileImage?: string;
   isActive?: boolean;
+  status?: UserStatus;
 }
 
 export interface UserQuery {
@@ -34,6 +36,7 @@ export interface UserQuery {
   department?: string;
   search?: string;
   isActive?: boolean;
+  status?: UserStatus;
 }
 
 export interface UsersListResult {

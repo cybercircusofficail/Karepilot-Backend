@@ -5,6 +5,7 @@ import {
   createUser,
   updateUser,
   deleteUser,
+  getUsersStats,
 } from "../../../../controllers/admin/user-management";
 import {
   authenticateAdmin,
@@ -21,6 +22,11 @@ import { validate } from "../../../../utils";
 const usersRouter = Router();
 
 usersRouter.use(authenticateAdmin);
+
+usersRouter.get(
+  "/stats",
+  getUsersStats
+);
 
 usersRouter.get(
   "/",

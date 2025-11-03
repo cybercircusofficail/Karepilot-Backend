@@ -1,4 +1,4 @@
-import { AdminUser, AdminRole } from "../../../models/admin/user-management";
+import { AdminUser, AdminRole, UserStatus } from "../../../models/admin/user-management";
 import Department from "../../../models/admin/user-management/departments";
 import { CreateUserData, UpdateUserData, UserQuery } from "../../../types/admin/user-management/users";
 
@@ -26,10 +26,10 @@ export class UsersService {
       ];
     }
 
-    if (query.isActive !== undefined) {
+    if (query.status) {
+      dbQuery.status = query.status;
+    } else if (query.isActive !== undefined) {
       dbQuery.isActive = query.isActive;
-    } else {
-      dbQuery.isActive = true;
     }
 
     const skip = (page - 1) * limit;
@@ -85,6 +85,7 @@ export class UsersService {
       phoneNumber: data.phoneNumber,
       badgeNumber: data.badgeNumber,
       shift: data.shift,
+      status: data.status || UserStatus.PENDING,
     });
 
     await user.save();
@@ -138,6 +139,25 @@ export class UsersService {
     }
 
     return user;
+  }
+
+  async getUsersStats() {
+    const totalUsers = await AdminUser.countDocuments({});
+    const activeUsers = await AdminUser.countDocuments({  isActive: true });
+    const totalDepartments = await Department.countDocuments({ isActive: true });
+    
+    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
+    const onlineNow = await AdminUser.countDocuments({
+      lastLogin: { $gte: fifteenMinutesAgo },
+      status: UserStatus.ACTIVE,
+    });
+
+    return {
+      totalUsers,
+      activeUsers,
+      totalDepartments,
+      onlineNow,
+    };
   }
 }
 

@@ -3,6 +3,12 @@ import * as bcrypt from "bcryptjs";
 import { AdminRole } from "./roles-permissions";
 import Department from "./departments";
 
+export enum UserStatus {
+  ACTIVE = "active",
+  PENDING = "pending",
+  INACTIVE = "inactive",
+}
+
 export interface IAdminUser extends Document {
   firstName: string;
   lastName: string;
@@ -15,6 +21,7 @@ export interface IAdminUser extends Document {
   shift?: string;
   profileImage?: string;
   isActive: boolean;
+  status: UserStatus;
   lastLogin?: Date;
   currentLocation?: string; 
   createdAt: Date;
@@ -87,13 +94,17 @@ const adminUserSchema = new Schema<IAdminUser>(
       type: Boolean,
       default: true,
     },
+    status: {
+      type: String,
+      enum: Object.values(UserStatus),
+      default: UserStatus.PENDING,
+    },
     lastLogin: {
       type: Date,
     },
     currentLocation: {
       type: String,
       trim: true,
-      default: "ICU Level 3",
     },
   },
   {
@@ -115,6 +126,25 @@ adminUserSchema.pre("save", async function (next) {
   if (this.role === AdminRole.ADMIN) {
     this.set("department", undefined);
   }
+  
+  // Sync status with isActive
+  if (this.isModified("isActive")) {
+    if (this.isActive === false) {
+      this.status = UserStatus.INACTIVE;
+    } else if (this.status === UserStatus.INACTIVE) {
+      this.status = UserStatus.ACTIVE;
+    }
+  }
+  
+  // Sync isActive with status
+  if (this.isModified("status")) {
+    if (this.status === UserStatus.INACTIVE) {
+      this.isActive = false;
+    } else if (this.status === UserStatus.ACTIVE) {
+      this.isActive = true;
+    }
+  }
+  
   if (!this.isModified("password")) return next();
 
   try {
@@ -139,6 +169,25 @@ adminUserSchema.pre(["updateOne", "findOneAndUpdate"], async function (next) {
     update.$unset.department = "";
     delete update.department;
   }
+  
+  // Sync status with isActive
+  if (update?.isActive !== undefined) {
+    if (update.isActive === false) {
+      update.status = UserStatus.INACTIVE;
+    } else if (!update.status || update.status === UserStatus.INACTIVE) {
+      update.status = UserStatus.ACTIVE;
+    }
+  }
+  
+  // Sync isActive with status
+  if (update?.status) {
+    if (update.status === UserStatus.INACTIVE) {
+      update.isActive = false;
+    } else if (update.status === UserStatus.ACTIVE) {
+      update.isActive = true;
+    }
+  }
+  
   if (update?.password) {
     try {
       const salt = await bcrypt.genSalt(12);
