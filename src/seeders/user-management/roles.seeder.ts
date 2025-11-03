@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import dbConnect from "../config/dbConnect";
-import { RolePermissions, DEFAULT_ROLE_PERMISSIONS, AdminRole } from "../models/admin/user-management";
+import dbConnect from "../../config/dbConnect";
+import { RolePermissions, DEFAULT_ROLE_PERMISSIONS, AdminRole } from "../../models/admin/user-management";
 
 const seedRoles = async () => {
   try {
@@ -32,7 +32,7 @@ const seedRoles = async () => {
       createdCount++;
     }
 
-    console.log("\n📊 Seeding Summary:");
+    console.log("\n📊 Roles Seeding Summary:");
     console.log(`   ✅ Created: ${createdCount} roles`);
     console.log(`   ⏭️  Skipped: ${skippedCount} roles`);
     console.log(`   📋 Total: ${roles.length} roles`);
@@ -45,11 +45,11 @@ const seedRoles = async () => {
 if (require.main === module) {
   seedRoles()
     .then(() => {
-      console.log("\n✅ Seeder completed successfully!");
+      console.log("\n✅ Roles seeder completed successfully!");
       process.exit(0);
     })
     .catch((error) => {
-      console.error("\n❌ Seeder failed:", error.message);
+      console.error("\n❌ Roles seeder failed:", error.message);
       process.exit(1);
     });
 }

@@ -14,9 +14,11 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "tsc --noEmit",
     "lint:fix": "tsc --noEmit",
-    "seed:admin": "tsx src/seeders/adminUser.seeder.ts",
-    "seed:roles": "tsx src/seeders/roles.seeder.ts",
-    "seed:all": "tsx src/seeders/index.ts"
+    "seed:all": "tsx src/seeders/index.ts",
+    "seed:user-management": "tsx src/seeders/user-management/index.ts",
+    "seed:users": "tsx src/seeders/user-management/users.seeder.ts",
+    "seed:user-roles": "tsx src/seeders/user-management/roles.seeder.ts",
+    "seed:user-departments": "tsx src/seeders/user-management/departments.seeder.ts"
   },
   "keywords": [
     "mobile-app",

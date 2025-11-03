@@ -1,6 +1,5 @@
 import dbConnect from "../config/dbConnect";
-import seedAdminUser from "./adminUser.seeder";
-import seedRoles from "./roles.seeder";
+import runUserManagementSeeders from "./user-management/index";
 
 const runAllSeeders = async () => {
   try {
@@ -9,12 +8,8 @@ const runAllSeeders = async () => {
     await dbConnect();
     console.log("");
 
-    console.log("📋 Seeding roles...");
-    await seedRoles();
-    console.log("");
-
-    console.log("👤 Seeding admin user...");
-    await seedAdminUser();
+    console.log("👥 Running User Management seeders...");
+    await runUserManagementSeeders();
 
     console.log("\n✅ All seeders completed successfully!");
     process.exit(0);
