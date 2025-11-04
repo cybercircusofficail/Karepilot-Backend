@@ -9,7 +9,6 @@ const seedUsers = async () => {
       await dbConnect();
     }
 
-    // Fetch all departments to assign to users
     const departments = await Department.find({ isActive: true });
     const departmentMap = new Map(
       departments.map((dept) => [dept.name.toLowerCase(), dept._id])
@@ -23,7 +22,7 @@ const seedUsers = async () => {
         password: "Admin@123",
         role: AdminRole.ADMIN,
         status: UserStatus.ACTIVE,
-        departmentName: null, // Admin role doesn't have department
+        departmentName: null,
         currentLocation: "Main Office",
       },
       {

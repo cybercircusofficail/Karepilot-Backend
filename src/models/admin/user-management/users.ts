@@ -127,7 +127,6 @@ adminUserSchema.pre("save", async function (next) {
     this.set("department", undefined);
   }
   
-  // Sync status with isActive
   if (this.isModified("isActive")) {
     if (this.isActive === false) {
       this.status = UserStatus.INACTIVE;
@@ -136,7 +135,6 @@ adminUserSchema.pre("save", async function (next) {
     }
   }
   
-  // Sync isActive with status
   if (this.isModified("status")) {
     if (this.status === UserStatus.INACTIVE) {
       this.isActive = false;
@@ -170,7 +168,6 @@ adminUserSchema.pre(["updateOne", "findOneAndUpdate"], async function (next) {
     delete update.department;
   }
   
-  // Sync status with isActive
   if (update?.isActive !== undefined) {
     if (update.isActive === false) {
       update.status = UserStatus.INACTIVE;
@@ -179,7 +176,6 @@ adminUserSchema.pre(["updateOne", "findOneAndUpdate"], async function (next) {
     }
   }
   
-  // Sync isActive with status
   if (update?.status) {
     if (update.status === UserStatus.INACTIVE) {
       update.isActive = false;
