@@ -56,7 +56,7 @@ export class UsersService {
 
   async getUserById(id: string) {
     const user = await AdminUser.findById(id).select("-password").populate("department");
-    if (!user || !user.isActive) {
+    if (!user) {
       throw new Error("User not found");
     }
     return user;
