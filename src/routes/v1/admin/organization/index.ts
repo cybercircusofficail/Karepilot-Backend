@@ -1,9 +1,12 @@
 import { Router } from "express";
 import venueTemplateRouter from "./venueTemplate";
+import organizationRouter from "./organization";
 
-const organizationRouter = Router();
+const router = Router();
 
-organizationRouter.use("/venue-templates", venueTemplateRouter);
+router.use("/venue-templates", venueTemplateRouter);
 
-export default organizationRouter;
+router.use("/", organizationRouter);
+
+export default router;
 

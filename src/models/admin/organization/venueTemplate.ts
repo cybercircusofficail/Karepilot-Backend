@@ -50,8 +50,6 @@ const venueTemplateSchema = new Schema<IVenueTemplate>(
   }
 );
 
-venueTemplateSchema.index({ name: 1 });
-
 const VenueTemplate = mongoose.model<IVenueTemplate>("VenueTemplate", venueTemplateSchema);
 
 export default VenueTemplate;
