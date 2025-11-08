@@ -6,6 +6,7 @@ import {
   updateOrganization,
   deleteOrganization,
   deleteOrganizationPermanently,
+  getOrganizationsOverview,
 } from "../../../../controllers/admin/organization";
 import { authenticateAdmin } from "../../../../middlewares/auth";
 import {
@@ -25,6 +26,8 @@ organizationRouter.get(
   validate(organizationQuerySchema, "query"),
   getAllOrganizations
 );
+
+organizationRouter.get("/overview", getOrganizationsOverview);
 
 organizationRouter.get(
   "/:id",

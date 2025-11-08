@@ -4,6 +4,7 @@ import VenueTemplate from "./venueTemplate";
 
 export enum OrganizationType {
   HOSPITAL = "Hospital",
+  AIRPORT = "Airport",
   CLINIC = "Clinic",
   SHOPPING_MALL = "Shopping Mall",
   OPEN_PLACE = "Open Place",

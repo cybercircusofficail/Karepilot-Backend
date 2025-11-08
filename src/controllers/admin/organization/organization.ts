@@ -252,3 +252,23 @@ export const deleteOrganizationPermanently = async (req: Request, res: Response)
   }
 };
 
+export const getOrganizationsOverview = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const overview = await organizationService.getOrganizationsOverview();
+
+    res.status(200).json({
+      success: true,
+      message: "Organization overview retrieved successfully",
+      data: overview,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || "Error retrieving organization overview",
+    });
+  }
+};
+

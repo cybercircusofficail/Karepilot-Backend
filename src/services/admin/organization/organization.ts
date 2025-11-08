@@ -1,4 +1,6 @@
-import Organization from "../../../models/admin/organization/organization";
+import Organization, {
+  OrganizationType,
+} from "../../../models/admin/organization/organization";
 import VenueTemplate from "../../../models/admin/organization/venueTemplate";
 import { CreateOrganizationData, UpdateOrganizationData, OrganizationQuery } from "../../../types/admin/organization/organization";
 
@@ -181,6 +183,206 @@ export class OrganizationService {
     }
 
     await Organization.findByIdAndDelete(id);
+  }
+
+  private computeChange(current: number, previous: number): number {
+    if (previous === 0) {
+      return current === 0 ? 0 : 100;
+    }
+    return Number((((current - previous) / previous) * 100).toFixed(2));
+  }
+
+  async getOrganizationsOverview() {
+    const now = new Date();
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+
+    const [
+      totalCount,
+      activeCount,
+      hospitalCount,
+      totalCreatedCurrent,
+      totalCreatedPrevious,
+      activeCreatedCurrent,
+      activeCreatedPrevious,
+      hospitalCreatedCurrent,
+      hospitalCreatedPrevious,
+      distribution,
+    ] = await Promise.all([
+      Organization.countDocuments({}),
+      Organization.countDocuments({ isActive: true }),
+      Organization.countDocuments({ organizationType: "Hospital" }),
+      Organization.countDocuments({ createdAt: { $gte: sevenDaysAgo } }),
+      Organization.countDocuments({
+        createdAt: { $gte: fourteenDaysAgo, $lt: sevenDaysAgo },
+      }),
+      Organization.countDocuments({
+        isActive: true,
+        createdAt: { $gte: sevenDaysAgo },
+      }),
+      Organization.countDocuments({
+        isActive: true,
+        createdAt: { $gte: fourteenDaysAgo, $lt: sevenDaysAgo },
+      }),
+      Organization.countDocuments({
+        organizationType: "Hospital",
+        createdAt: { $gte: sevenDaysAgo },
+      }),
+      Organization.countDocuments({
+        organizationType: "Hospital",
+        createdAt: { $gte: fourteenDaysAgo, $lt: sevenDaysAgo },
+      }),
+      Organization.find({})
+        .populate("venueTemplate", "name")
+        .select("organizationType venueTemplate"),
+    ]);
+
+    const otherCount = Math.max(0, totalCount - hospitalCount);
+    const otherCreatedCurrent = Math.max(
+      0,
+      totalCreatedCurrent - hospitalCreatedCurrent,
+    );
+    const otherCreatedPrevious = Math.max(
+      0,
+      totalCreatedPrevious - hospitalCreatedPrevious,
+    );
+
+    const summary = {
+      total: {
+        count: totalCount,
+        change: this.computeChange(totalCreatedCurrent, totalCreatedPrevious),
+      },
+      active: {
+        count: activeCount,
+        change: this.computeChange(
+          activeCreatedCurrent,
+          activeCreatedPrevious,
+        ),
+      },
+      hospitals: {
+        count: hospitalCount,
+        change: this.computeChange(
+          hospitalCreatedCurrent,
+          hospitalCreatedPrevious,
+        ),
+      },
+      otherVenues: {
+        count: otherCount,
+        change: this.computeChange(
+          otherCreatedCurrent,
+          otherCreatedPrevious,
+        ),
+      },
+    };
+
+    const distributionMap: Record<
+      "Hospital" | "Airport" | "Shopping Mall" | "Open Place",
+      number
+    > = {
+      Hospital: 0,
+      Airport: 0,
+      "Shopping Mall": 0,
+      "Open Place": 0,
+    };
+
+    for (const organization of distribution) {
+      const orgType = organization.organizationType;
+      const templateName = (
+        (organization.venueTemplate as any)?.name ?? ""
+      ).toString();
+      let normalizedType: keyof typeof distributionMap | null = null;
+
+      switch (orgType) {
+        case OrganizationType.HOSPITAL:
+          normalizedType = "Hospital";
+          break;
+        case OrganizationType.AIRPORT:
+          normalizedType = "Airport";
+          break;
+        case OrganizationType.SHOPPING_MALL:
+          normalizedType = "Shopping Mall";
+          break;
+        case OrganizationType.OPEN_PLACE:
+          normalizedType = "Open Place";
+          break;
+        default:
+          if (/airport/i.test(templateName)) {
+            normalizedType = "Airport";
+          } else if (/shopping/i.test(templateName) || /mall/i.test(templateName)) {
+            normalizedType = "Shopping Mall";
+          } else if (/open/i.test(templateName) || /campus/i.test(templateName)) {
+            normalizedType = "Open Place";
+          } else if (/hospital/i.test(templateName) || /clinic/i.test(templateName)) {
+            normalizedType = "Hospital";
+          }
+          break;
+      }
+
+      if (normalizedType) {
+        distributionMap[normalizedType] += 1;
+      }
+    }
+
+    const distributionResult = (Object.keys(
+      distributionMap,
+    ) as Array<keyof typeof distributionMap>).map((key) => ({
+      organizationType: key,
+      count: distributionMap[key],
+    }));
+
+    const recentOrganizations = await Organization.find({})
+      .populate("createdBy", "firstName lastName email")
+      .populate("updatedBy", "firstName lastName email")
+      .sort({ updatedAt: -1 })
+      .limit(4);
+
+    const recentActivity = recentOrganizations.map((organization) => {
+      const createdAt = organization.createdAt;
+      const updatedAt = organization.updatedAt;
+      let activityType: "created" | "updated" | "deactivated" = "created";
+
+      if (!organization.isActive) {
+        activityType = "deactivated";
+      } else if (
+        updatedAt &&
+        createdAt &&
+        updatedAt.getTime() - createdAt.getTime() > 60 * 1000
+      ) {
+        activityType = "updated";
+      }
+
+      const actor =
+        activityType === "created"
+          ? organization.createdBy
+          : organization.updatedBy || organization.createdBy;
+
+      return {
+        id: organization._id,
+        name: organization.name,
+        organizationType: organization.organizationType,
+        isActive: organization.isActive,
+        activityType,
+        createdAt,
+        updatedAt,
+        actor: actor
+          ? {
+              id:
+                (actor as any)?.id ||
+                (actor as any)?._id?.toString?.() ||
+                undefined,
+              firstName: (actor as any)?.firstName ?? "",
+              lastName: (actor as any)?.lastName ?? "",
+              email: (actor as any)?.email ?? "",
+            }
+          : null,
+      };
+    });
+
+    return {
+      summary,
+      distribution: distributionResult,
+      recentActivity,
+    };
   }
 }
 

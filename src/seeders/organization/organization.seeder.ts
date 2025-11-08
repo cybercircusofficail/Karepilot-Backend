@@ -35,7 +35,7 @@ const organizationsToSeed: SeedOrganizationPayload[] = [
   },
   {
     name: "SkyWays International Airport",
-    organizationType: OrganizationType.OTHER,
+    organizationType: OrganizationType.AIRPORT,
     email: "support@skywaysairport.com",
     phone: "+44 20 7946 0110",
     country: "United Kingdom",
@@ -47,7 +47,7 @@ const organizationsToSeed: SeedOrganizationPayload[] = [
   },
   {
     name: "Pacific Gateway Airport",
-    organizationType: OrganizationType.OTHER,
+    organizationType: OrganizationType.AIRPORT,
     email: "hello@pacificgatewayairport.com",
     phone: "+61 2 5550 8877",
     country: "Australia",
