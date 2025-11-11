@@ -29,6 +29,7 @@ export const registerMobileUser = async (req: Request, res: Response): Promise<v
 
 export const verifyEmail = async (req: Request, res: Response): Promise<void> => {
   try {
+    
     const { code } = req.body;
 
     const result = await mobileUserService.verifyEmail({ code });
