@@ -4,9 +4,13 @@ import Organization from "../../models/admin/organization/organization";
 import MapBuilding from "../../models/admin/map-manager/mapBuilding";
 import MapFloor from "../../models/admin/map-manager/mapFloor";
 import MapManagerSettings from "../../models/admin/map-manager/mapSettings";
+import FloorPlan, {
+  IFloorPlanFileMetadata,
+  IFloorPlanPreview,
+} from "../../models/admin/map-manager/floorPlan";
+import { FloorPlanStatus, MapLayerType } from "../../models/admin/map-manager";
 import AdminUser from "../../models/admin/user-management/users";
 import { AdminRole } from "../../models/admin/user-management/roles-permissions";
-import { MapLayerType } from "../../models/admin/map-manager";
 
 interface FloorSeedData {
   name: string;
@@ -18,6 +22,20 @@ interface FloorSeedData {
   isDefault?: boolean;
   tags?: string[];
   attributes?: Record<string, any>;
+}
+
+interface FloorPlanSeedData {
+  floorName: string;
+  name: string;
+  status?: FloorPlanStatus;
+  description?: string;
+  scale?: string;
+  tags?: string[];
+  previewUrl?: string;
+  fileUrl?: string;
+  fileName?: string;
+  mimeType?: string;
+  fileSizeInBytes?: number;
 }
 
 interface BuildingSeedData {
@@ -39,12 +57,37 @@ interface BuildingSeedData {
   };
   metadata?: Record<string, any>;
   floors: FloorSeedData[];
+  floorPlans?: FloorPlanSeedData[];
+}
+
+interface MapManagerSettingsSeed {
+  autoPublishUpdates?: boolean;
+  highResThumbnails?: boolean;
+  enableVersionControl?: boolean;
+  defaultGridSize?: number;
+  defaultGridUnit?: "px" | "ft" | "m";
+  defaultSnapToGrid?: boolean;
+  defaultShowGrid?: boolean;
+  defaultZoom?: number;
+  defaultMapScale?: string;
+  allowedFileTypes?: string[];
+  maxUploadSizeMb?: number;
+  defaultLayerVisibility?: Record<MapLayerType, boolean>;
+  notificationPreferences?: {
+    publishSuccess?: boolean;
+    publishFailure?: boolean;
+    approvalRequired?: boolean;
+  };
+  retentionPolicy?: {
+    keepDraftVersions?: number;
+    keepPublishedSnapshots?: number;
+  };
 }
 
 interface MapManagerSeedPayload {
   organizationName: string;
   buildings: BuildingSeedData[];
-  settings?: Partial<Omit<Parameters<typeof MapManagerSettings.create>[0], "organization">>;
+  settings?: MapManagerSettingsSeed;
 }
 
 const mapManagerSeedData: MapManagerSeedPayload[] = [
@@ -139,6 +182,36 @@ const mapManagerSeedData: MapManagerSeedPayload[] = [
             tags: ["ICU", "cardiac"],
           },
         ],
+        floorPlans: [
+          {
+            floorName: "Ground Floor",
+            name: "Emergency Operations",
+            status: FloorPlanStatus.PUBLISHED,
+            description: "Ground floor triage and radiology layout.",
+            scale: "1:150",
+            tags: ["emergency", "radiology"],
+            previewUrl:
+              "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=900&q=80",
+            fileUrl: "https://cdn.karepilot.dev/floor-plans/emergency-operations.pdf",
+            fileName: "emergency-operations.pdf",
+            mimeType: "application/pdf",
+            fileSizeInBytes: 2560000,
+          },
+          {
+            floorName: "Surgical Level",
+            name: "Operating Theaters",
+            status: FloorPlanStatus.IN_PROGRESS,
+            description: "Operating rooms and sterile processing layout.",
+            scale: "1:200",
+            tags: ["surgery", "sterile"],
+            previewUrl:
+              "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=900&q=80",
+            fileUrl: "https://cdn.karepilot.dev/floor-plans/operating-theaters.pdf",
+            fileName: "operating-theaters.pdf",
+            mimeType: "application/pdf",
+            fileSizeInBytes: 3120000,
+          },
+        ],
       },
       {
         name: "Emergency Pavilion",
@@ -188,6 +261,36 @@ const mapManagerSeedData: MapManagerSeedPayload[] = [
             description: "Negative-pressure isolation units and decontamination vestibules.",
             tags: ["isolation", "negative-pressure"],
             isBasement: true,
+          },
+        ],
+        floorPlans: [
+          {
+            floorName: "Emergency Intake",
+            name: "Rapid Triage Layout",
+            status: FloorPlanStatus.PUBLISHED,
+            description: "Trauma bay arrangement and diagnostic radiology access.",
+            scale: "1:180",
+            tags: ["trauma", "diagnostics"],
+            previewUrl:
+              "https://images.unsplash.com/photo-1526256262350-7da7584cf5eb?auto=format&fit=crop&w=900&q=80",
+            fileUrl: "https://cdn.karepilot.dev/floor-plans/rapid-triage-layout.pdf",
+            fileName: "rapid-triage-layout.pdf",
+            mimeType: "application/pdf",
+            fileSizeInBytes: 1980000,
+          },
+          {
+            floorName: "Observation & Step-Down",
+            name: "Observation Suites",
+            status: FloorPlanStatus.DRAFT,
+            description: "Telemetry monitoring and observation suites layout.",
+            scale: "1:160",
+            tags: ["observation", "telemetry"],
+            previewUrl:
+              "https://images.unsplash.com/photo-1526256262350-7da7584cf5eb?auto=format&fit=crop&w=900&q=80",
+            fileUrl: "https://cdn.karepilot.dev/floor-plans/observation-suites.pdf",
+            fileName: "observation-suites.pdf",
+            mimeType: "application/pdf",
+            fileSizeInBytes: 2240000,
           },
         ],
       },
@@ -283,6 +386,36 @@ const mapManagerSeedData: MapManagerSeedPayload[] = [
             tags: ["gates"],
           },
         ],
+        floorPlans: [
+          {
+            floorName: "Arrivals Hall",
+            name: "Arrivals Processing Layout",
+            status: FloorPlanStatus.PUBLISHED,
+            description: "Immigration counters, baggage claim, and transport hub.",
+            scale: "1:250",
+            tags: ["arrivals", "immigration"],
+            previewUrl:
+              "https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=900&q=80",
+            fileUrl: "https://cdn.karepilot.dev/floor-plans/arrivals-processing.pdf",
+            fileName: "arrivals-processing.pdf",
+            mimeType: "application/pdf",
+            fileSizeInBytes: 3480000,
+          },
+          {
+            floorName: "Departures Concourse",
+            name: "Departure Concourse",
+            status: FloorPlanStatus.PUBLISHED,
+            description: "Security checkpoints and duty-free retail configuration.",
+            scale: "1:220",
+            tags: ["departures", "retail"],
+            previewUrl:
+              "https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=900&q=80",
+            fileUrl: "https://cdn.karepilot.dev/floor-plans/departure-concourse.pdf",
+            fileName: "departure-concourse.pdf",
+            mimeType: "application/pdf",
+            fileSizeInBytes: 3020000,
+          },
+        ],
       },
       {
         name: "Cargo & Logistics Center",
@@ -324,6 +457,22 @@ const mapManagerSeedData: MapManagerSeedPayload[] = [
             description: "Temperature-controlled storage for pharmaceuticals and perishables.",
             tags: ["cold-chain", "storage"],
             isBasement: true,
+          },
+        ],
+        floorPlans: [
+          {
+            floorName: "Operations Floor",
+            name: "Cargo Operations Flow",
+            status: FloorPlanStatus.PUBLISHED,
+            description: "Cargo sorting belts and customs inspection layout.",
+            scale: "1:300",
+            tags: ["cargo", "logistics"],
+            previewUrl:
+              "https://images.unsplash.com/photo-1542435503-956c469947f6?auto=format&fit=crop&w=900&q=80",
+            fileUrl: "https://cdn.karepilot.dev/floor-plans/cargo-operations.pdf",
+            fileName: "cargo-operations.pdf",
+            mimeType: "application/pdf",
+            fileSizeInBytes: 2870000,
           },
         ],
       },
@@ -418,6 +567,36 @@ const mapManagerSeedData: MapManagerSeedPayload[] = [
             tags: ["tech"],
           },
         ],
+        floorPlans: [
+          {
+            floorName: "Atrium Level",
+            name: "Atrium Retail Grid",
+            status: FloorPlanStatus.PUBLISHED,
+            description: "Anchor store and experiential retail placement.",
+            scale: "1:120",
+            tags: ["retail", "experiential"],
+            previewUrl:
+              "https://images.unsplash.com/photo-1483478550801-ceba5fe50e8e?auto=format&fit=crop&w=900&q=80",
+            fileUrl: "https://cdn.karepilot.dev/floor-plans/atrium-retail.pdf",
+            fileName: "atrium-retail.pdf",
+            mimeType: "application/pdf",
+            fileSizeInBytes: 2540000,
+          },
+          {
+            floorName: "Lifestyle Terrace",
+            name: "Lifestyle Terrace",
+            status: FloorPlanStatus.DRAFT,
+            description: "Boutique stores, cafes, and green rooftop access.",
+            scale: "1:140",
+            tags: ["lifestyle", "food"],
+            previewUrl:
+              "https://images.unsplash.com/photo-1483478550801-ceba5fe50e8e?auto=format&fit=crop&w=900&q=80",
+            fileUrl: "https://cdn.karepilot.dev/floor-plans/lifestyle-terrace.pdf",
+            fileName: "lifestyle-terrace.pdf",
+            mimeType: "application/pdf",
+            fileSizeInBytes: 1960000,
+          },
+        ],
       },
       {
         name: "Harbor Conference Center",
@@ -468,10 +647,141 @@ const mapManagerSeedData: MapManagerSeedPayload[] = [
             isBasement: true,
           },
         ],
+        floorPlans: [
+          {
+            floorName: "Event Concourse",
+            name: "Conference Layout",
+            status: FloorPlanStatus.PUBLISHED,
+            description: "Ballroom configuration with breakout rooms.",
+            scale: "1:180",
+            tags: ["conference", "event"],
+            previewUrl:
+              "https://images.unsplash.com/photo-1542318428-29f26af1ff86?auto=format&fit=crop&w=900&q=80",
+            fileUrl: "https://cdn.karepilot.dev/floor-plans/conference-layout.pdf",
+            fileName: "conference-layout.pdf",
+            mimeType: "application/pdf",
+            fileSizeInBytes: 3150000,
+          },
+        ],
       },
     ],
   },
 ];
+
+const seedPayloadLookup = new Map<string, MapManagerSeedPayload>();
+mapManagerSeedData.forEach((payload) => {
+  seedPayloadLookup.set(payload.organizationName.toLowerCase(), payload);
+});
+
+const createDefaultSeedPayload = (organizationName: string): MapManagerSeedPayload => ({
+  organizationName,
+  settings: {
+    autoPublishUpdates: true,
+    highResThumbnails: true,
+    enableVersionControl: true,
+    defaultGridSize: 20,
+    defaultGridUnit: "px",
+    defaultSnapToGrid: true,
+    defaultShowGrid: true,
+    defaultZoom: 125,
+    defaultMapScale: "1:200",
+    allowedFileTypes: ["pdf", "png", "jpg"],
+    maxUploadSizeMb: 80,
+    defaultLayerVisibility: {
+      [MapLayerType.FLOOR_PLAN]: true,
+      [MapLayerType.POI]: true,
+      [MapLayerType.PATH]: true,
+      [MapLayerType.ZONE]: true,
+      [MapLayerType.LABEL]: true,
+      [MapLayerType.ENTRANCE]: true,
+      [MapLayerType.ELEVATOR]: true,
+      [MapLayerType.RESTRICTED_ZONE]: false,
+      [MapLayerType.TAG]: true,
+      [MapLayerType.RULER]: false,
+      [MapLayerType.MEASUREMENT]: false,
+      [MapLayerType.ANNOTATION]: true,
+      [MapLayerType.MESSAGE]: false,
+      [MapLayerType.MEDIA]: true,
+    },
+    notificationPreferences: {
+      publishSuccess: true,
+      publishFailure: true,
+      approvalRequired: false,
+    },
+    retentionPolicy: {
+      keepDraftVersions: 5,
+      keepPublishedSnapshots: 3,
+    },
+  },
+  buildings: [
+    {
+      name: `${organizationName} Main Facility`,
+      code: "MAIN-BLD",
+      description: `Primary building for ${organizationName}`,
+      tags: ["facility", "main"],
+      metadata: {
+        totalRooms: 120,
+      },
+      floors: [
+        {
+          name: "Ground Floor",
+          code: "MAIN-G",
+          level: 0,
+          sequence: 0,
+          description: "Reception, lobby, and visitor services.",
+          tags: ["lobby", "services"],
+          isDefault: true,
+        },
+        {
+          name: "Level 1",
+          code: "MAIN-L1",
+          level: 1,
+          sequence: 10,
+          description: "Operational offices and meeting rooms.",
+          tags: ["operations"],
+        },
+        {
+          name: "Level 2",
+          code: "MAIN-L2",
+          level: 2,
+          sequence: 20,
+          description: "Support services and maintenance hub.",
+          tags: ["support"],
+        },
+      ],
+      floorPlans: [
+        {
+          floorName: "Ground Floor",
+          name: "Ground Floor Overview",
+          status: FloorPlanStatus.PUBLISHED,
+          description: "Entrance, lobby, and security layout.",
+          scale: "1:180",
+          tags: ["lobby", "security"],
+          previewUrl:
+            "https://images.unsplash.com/photo-1529429617124-aee0a91b4174?auto=format&fit=crop&w=900&q=80",
+          fileUrl: "https://cdn.karepilot.dev/floor-plans/ground-floor-overview.pdf",
+          fileName: "ground-floor-overview.pdf",
+          mimeType: "application/pdf",
+          fileSizeInBytes: 2100000,
+        },
+        {
+          floorName: "Level 1",
+          name: "Level 1 Operations",
+          status: FloorPlanStatus.DRAFT,
+          description: "Operational offices and meeting rooms layout.",
+          scale: "1:200",
+          tags: ["operations"],
+          previewUrl:
+            "https://images.unsplash.com/photo-1529429617124-aee0a91b4174?auto=format&fit=crop&w=900&q=80",
+          fileUrl: "https://cdn.karepilot.dev/floor-plans/level1-operations.pdf",
+          fileName: "level1-operations.pdf",
+          mimeType: "application/pdf",
+          fileSizeInBytes: 1900000,
+        },
+      ],
+    },
+  ],
+});
 
 const seedMapManagerData = async () => {
   try {
@@ -487,23 +797,30 @@ const seedMapManagerData = async () => {
     let buildingsUpdated = 0;
     let floorsCreated = 0;
     let floorsUpdated = 0;
+    let floorPlansCreated = 0;
+    let floorPlansUpdated = 0;
     let settingsUpserted = 0;
-    let skippedOrganizations = 0;
 
-    for (const payload of mapManagerSeedData) {
-      const organization = await Organization.findOne({
-        name: { $regex: new RegExp(`^${payload.organizationName}$`, "i") },
-      }).select("_id name");
+    const organizations = await Organization.find({}).select("_id name");
 
-      if (!organization?._id) {
-        console.warn(
-          `⚠️  Organization "${payload.organizationName}" not found. Skipping map manager seed for this entry.`,
-        );
-        skippedOrganizations++;
-        continue;
-      }
-
+    for (const organization of organizations) {
+      const organizationName = organization.name;
       const organizationId = new mongoose.Types.ObjectId(String(organization._id));
+
+      const payload =
+        seedPayloadLookup.get(organizationName.toLowerCase()) ??
+        createDefaultSeedPayload(organizationName);
+
+      const seedSettings = payload.settings ?? {};
+      const defaultGridSize = seedSettings.defaultGridSize ?? 20;
+      const defaultGridUnit = (seedSettings.defaultGridUnit as "px" | "ft" | "m") ?? "px";
+      const defaultSnapToGrid = seedSettings.defaultSnapToGrid ?? true;
+      const defaultShowGrid = seedSettings.defaultShowGrid ?? true;
+      const defaultZoom = seedSettings.defaultZoom ?? 100;
+      const autoPublishUpdates = seedSettings.autoPublishUpdates ?? false;
+      const highResThumbnails = seedSettings.highResThumbnails ?? true;
+      const enableVersionControl = seedSettings.enableVersionControl ?? true;
+      const approvalRequired = seedSettings.notificationPreferences?.approvalRequired ?? false;
 
       for (const buildingData of payload.buildings) {
         let building = await MapBuilding.findOne({
@@ -611,6 +928,152 @@ const seedMapManagerData = async () => {
         building.defaultFloor = defaultFloorId;
         building.updatedBy = createdBy ?? building.updatedBy ?? null;
         await building.save();
+
+        const floorDocs = await MapFloor.find({
+          organization: organizationId,
+          building: building._id,
+        });
+
+        const floorMap = new Map<string, mongoose.Types.ObjectId>();
+        floorDocs.forEach((floor) => {
+          floorMap.set(floor.name.toLowerCase(), floor._id as mongoose.Types.ObjectId);
+        });
+
+        const floorPlansData = buildingData.floorPlans ?? [];
+        for (const floorPlanData of floorPlansData) {
+          const targetFloorId = floorMap.get(floorPlanData.floorName.toLowerCase());
+          if (!targetFloorId) {
+            console.warn(
+              `⚠️  Floor "${floorPlanData.floorName}" not found for building "${buildingData.name}" while creating floor plan "${floorPlanData.name}".`,
+            );
+            continue;
+          }
+
+          const fileMetadata: IFloorPlanFileMetadata | undefined = floorPlanData.fileName
+            ? (() => {
+                const metadata: IFloorPlanFileMetadata = {
+                  storageKey: `${buildingData.code}/${floorPlanData.fileName}`,
+                  fileName: floorPlanData.fileName,
+                  originalName: floorPlanData.fileName,
+                  mimeType: floorPlanData.mimeType ?? "application/pdf",
+                  fileSizeInBytes: floorPlanData.fileSizeInBytes ?? 2_000_000,
+                  uploadedAt: new Date(),
+                };
+                if (floorPlanData.fileUrl) {
+                  metadata.url = floorPlanData.fileUrl;
+                }
+                return metadata;
+              })()
+            : undefined;
+
+          const previewMetadata: IFloorPlanPreview | undefined = floorPlanData.previewUrl
+            ? {
+                url: floorPlanData.previewUrl,
+                generatedAt: new Date(),
+              }
+            : undefined;
+
+          let floorPlan = await FloorPlan.findOne({
+            organization: organizationId,
+            building: building._id,
+            floor: targetFloorId,
+            name: { $regex: new RegExp(`^${floorPlanData.name}$`, "i") },
+          });
+
+          if (!floorPlan) {
+            const createPayload: any = {
+              organization: organizationId,
+              building: building._id,
+              floor: targetFloorId,
+              name: floorPlanData.name,
+              status: floorPlanData.status ?? FloorPlanStatus.DRAFT,
+              tags: floorPlanData.tags ?? [],
+              stats: {
+                poiCount: 0,
+                pathCount: 0,
+                zoneCount: 0,
+                labelCount: 0,
+                entranceCount: 0,
+                elevatorCount: 0,
+                restrictedZoneCount: 0,
+                annotationCount: 0,
+                draftElementCount: 0,
+              },
+              settings: {
+                gridSize: defaultGridSize,
+                gridUnit: defaultGridUnit,
+                snapToGrid: defaultSnapToGrid,
+                showGrid: defaultShowGrid,
+                defaultZoom,
+                autoPublish: autoPublishUpdates,
+                highResThumbnails,
+                versionControl: enableVersionControl,
+              },
+              versionNumber: 1,
+              currentVersion: null,
+              publishedVersion: null,
+              lastPublishedAt:
+                floorPlanData.status === FloorPlanStatus.PUBLISHED ? new Date() : null,
+              publishOptions: {
+                autoPublish: autoPublishUpdates,
+                requireApproval: approvalRequired,
+              },
+              isLocked: false,
+              createdBy,
+              updatedBy: createdBy,
+            };
+
+            if (fileMetadata) {
+              createPayload.file = fileMetadata;
+            }
+
+            if (previewMetadata) {
+              createPayload.preview = previewMetadata;
+            }
+
+            if (floorPlanData.description !== undefined) {
+              createPayload.description = floorPlanData.description;
+            }
+
+            if (floorPlanData.scale !== undefined) {
+              createPayload.scale = floorPlanData.scale;
+            }
+
+            await FloorPlan.create(createPayload);
+            floorPlansCreated++;
+          } else {
+            if (floorPlanData.status) {
+              floorPlan.status = floorPlanData.status;
+            }
+
+            if (floorPlanData.description !== undefined) {
+              floorPlan.description = floorPlanData.description;
+            }
+
+            if (floorPlanData.scale !== undefined) {
+              floorPlan.scale = floorPlanData.scale;
+            }
+
+            if (floorPlanData.tags !== undefined) {
+              floorPlan.tags = floorPlanData.tags;
+            }
+
+            if (fileMetadata) {
+              floorPlan.file = fileMetadata as any;
+            }
+
+            if (previewMetadata) {
+              floorPlan.preview = previewMetadata as any;
+            }
+
+            floorPlan.updatedBy = createdBy ?? floorPlan.updatedBy ?? null;
+            if (floorPlan.status === FloorPlanStatus.PUBLISHED && !floorPlan.lastPublishedAt) {
+              floorPlan.lastPublishedAt = new Date();
+            }
+            await floorPlan.save();
+            floorPlansUpdated++;
+          }
+        }
       }
 
       if (payload.settings) {
@@ -637,8 +1100,9 @@ const seedMapManagerData = async () => {
     console.log(`   🔄 Buildings updated: ${buildingsUpdated}`);
     console.log(`   ✅ Floors created: ${floorsCreated}`);
     console.log(`   🔄 Floors updated: ${floorsUpdated}`);
+    console.log(`   🗺️  Floor plans created: ${floorPlansCreated}`);
+    console.log(`   🔄 Floor plans updated: ${floorPlansUpdated}`);
     console.log(`   ⚙️  Settings upserted: ${settingsUpserted}`);
-    console.log(`   ⚠️  Organizations skipped: ${skippedOrganizations}`);
   } catch (error: any) {
     console.error("❌ Error seeding map manager data:", error.message);
     throw error;
