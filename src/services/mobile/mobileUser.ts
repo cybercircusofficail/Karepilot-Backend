@@ -215,7 +215,6 @@ export class MobileUserService {
       throw new Error("Mobile user not found");
     }
 
-    // Initialize settings if they don't exist
     if (!mobileUser.settings) {
       mobileUser.settings = {
         navigationPreferences: {
@@ -234,7 +233,6 @@ export class MobileUserService {
       };
     }
 
-    // Update navigation preferences
     if (data.navigationPreferences) {
       mobileUser.settings.navigationPreferences = {
         ...mobileUser.settings.navigationPreferences,
@@ -242,7 +240,6 @@ export class MobileUserService {
       };
     }
 
-    // Update language and voice
     if (data.languageAndVoice) {
       mobileUser.settings.languageAndVoice = {
         ...mobileUser.settings.languageAndVoice,
@@ -250,7 +247,6 @@ export class MobileUserService {
       };
     }
 
-    // Update accessibility
     if (data.accessibility) {
       mobileUser.settings.accessibility = {
         ...mobileUser.settings.accessibility,
