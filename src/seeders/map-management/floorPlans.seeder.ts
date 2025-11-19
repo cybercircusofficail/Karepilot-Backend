@@ -234,7 +234,7 @@ const floorPlansToSeed: FloorPlanSeedData[] = [
     floorNumber: 2,
     status: MapFloorPlanStatus.PUBLISHED,
     media: {
-      fileUrl: "https://images.pexels.com/photos/2405261/pexels-photo-2405261.jpeg",
+      fileUrl: "https://images.pexels.com/photos/28365735/pexels-photo-28365735.jpeg",
       fileKey: "floor-plans/skyways-terminal1-departure-level",
     },
     metadata: {
@@ -252,7 +252,7 @@ const floorPlansToSeed: FloorPlanSeedData[] = [
     floorNumber: 0,
     status: MapFloorPlanStatus.PUBLISHED,
     media: {
-      fileUrl: "https://images.pexels.com/photos/2405262/pexels-photo-2405262.jpeg",
+      fileUrl: "https://images.pexels.com/photos/28640604/pexels-photo-28640604.jpeg",
       fileKey: "floor-plans/skyways-terminal1-arrival-level",
     },
     metadata: {
@@ -270,7 +270,7 @@ const floorPlansToSeed: FloorPlanSeedData[] = [
     floorNumber: 3,
     status: MapFloorPlanStatus.PUBLISHED,
     media: {
-      fileUrl: "https://images.pexels.com/photos/2405263/pexels-photo-2405263.jpeg",
+      fileUrl: "https://images.pexels.com/photos/9754/mountains-clouds-forest-fog.jpg",
       fileKey: "floor-plans/skyways-terminal2-international-departures",
     },
     metadata: {
