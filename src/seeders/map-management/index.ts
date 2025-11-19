@@ -1,6 +1,7 @@
 import seedBuildings from "./buildings.seeder";
 import seedFloorPlans from "./floorPlans.seeder";
 import seedSettings from "./settings.seeder";
+import seedMapEditorPOIs from "./mapEditorPOI.seeder";
 
 const runMapManagementSeeders = async () => {
   try {
@@ -12,6 +13,10 @@ const runMapManagementSeeders = async () => {
 
     console.log("📐 Seeding floor plans...");
     await seedFloorPlans();
+    console.log("");
+
+    console.log("📍 Seeding map editor POIs...");
+    await seedMapEditorPOIs();
     console.log("");
 
     console.log("⚙️  Seeding settings...");

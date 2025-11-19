@@ -63,14 +63,12 @@ class MapEditorPOIService {
 
     const dbQuery: Record<string, unknown> = {
       floorPlan: floorPlanId,
+      // Default to only active POIs if not explicitly specified
+      isActive: typeof query.isActive === "boolean" ? query.isActive : true,
     };
 
     if (query.category) {
       dbQuery.category = { $regex: new RegExp(query.category, "i") };
-    }
-
-    if (typeof query.isActive === "boolean") {
-      dbQuery.isActive = query.isActive;
     }
 
     if (query.search) {
