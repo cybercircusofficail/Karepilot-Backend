@@ -16,7 +16,7 @@ interface PathTemplate {
 }
 
 const getPathColor = (): string => {
-  return "#2563EB"; // Blue color for paths
+  return "#2563EB";
 };
 
 const groundFloorPathTemplate: PathTemplate[] = [
@@ -208,7 +208,6 @@ const seedMapEditorPaths = async () => {
       );
 
       for (const pathTemplateData of pathTemplate) {
-        // Check if a path with the same name already exists
         if (pathTemplateData.name) {
           const existing = await MapEditorPath.findOne({
             floorPlan: floorPlanId,
@@ -221,7 +220,6 @@ const seedMapEditorPaths = async () => {
           }
         }
 
-        // Add slight random offset to points for variation
         const offsetPoints = pathTemplateData.points.map((point) => {
           const coordinateOffset = Math.floor(Math.random() * 15) - 7;
           return {
