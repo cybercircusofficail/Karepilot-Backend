@@ -170,7 +170,7 @@ const seedMapEditorEntrances = async () => {
           continue;
         }
 
-        const coordinateOffset = Math.floor(Math.random() * 20) - 10; // Random offset between -10 and 10
+        const coordinateOffset = Math.floor(Math.random() * 20) - 10;
         const x = entranceTemplateData.coordinates.x + coordinateOffset;
         const y = entranceTemplateData.coordinates.y + coordinateOffset;
 
@@ -180,7 +180,7 @@ const seedMapEditorEntrances = async () => {
           category: entranceTemplateData.category.trim(),
           description: entranceTemplateData.description?.trim() || undefined,
           coordinates: {
-            x: Math.max(50, x), // Ensure minimum coordinate value
+            x: Math.max(50, x),
             y: Math.max(50, y),
           },
           icon: entranceTemplateData.icon?.trim() || undefined,
