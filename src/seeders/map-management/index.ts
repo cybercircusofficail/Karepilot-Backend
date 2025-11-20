@@ -47,4 +47,3 @@ if (require.main === module) {
 }
 
 export default runMapManagementSeeders;
-
