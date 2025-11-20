@@ -1,6 +1,7 @@
 import MapEditorAnnotation from "../../models/admin/map-management/mapEditorAnnotation";
 import MapFloorPlan from "../../models/admin/map-management/mapFloorPlan";
-import User from "../../models/admin/user-management/users";
+import AdminUser from "../../models/admin/user-management/users";
+import { AdminRole } from "../../models/admin/user-management/roles-permissions";
 
 interface AnnotationTemplate {
   name: string;
@@ -86,30 +87,38 @@ export const seedMapEditorAnnotations = async () => {
   try {
     console.log("Seeding Map Editor Annotations...");
 
-    const adminUser = await User.findOne({ role: "admin" });
-    if (!adminUser) {
-      console.log("Admin user not found, skipping annotation seeding");
-      return;
-    }
-
     const floorPlans = await MapFloorPlan.find({ isActive: true });
     if (!floorPlans.length) {
-      console.log("No floor plans found, skipping annotation seeding");
+      console.log("❌ No floor plans found, skipping annotation seeding");
       return;
     }
 
+    const adminUser = await AdminUser.findOne({ role: AdminRole.ADMIN }).select("_id");
+    if (!adminUser) {
+      console.warn(
+        "⚠️  No admin user found. Annotations will be seeded without creator information.",
+      );
+    }
+
+    const createdBy = adminUser?._id || null;
+
     await MapEditorAnnotation.deleteMany({});
-    console.log("Deleted existing annotations");
+    console.log("🗑️  Deleted existing annotations");
 
     let annotationCount = 0;
 
+    console.log(`\n📋 Processing ${floorPlans.length} floor plans...\n`);
+
     for (const floorPlan of floorPlans) {
-      const floorLabel = (floorPlan as any).floorLabel?.toLowerCase?.() || "";
+      const floorNumber = (floorPlan as any).floorNumber;
+      const floorLabel = (floorPlan as any).floorLabel || "";
+      
+      // Determine if it's ground floor
       const isGroundFloor = 
-        floorLabel.includes("ground") ||
-        floorLabel.includes("first") ||
-        (floorPlan as any).floorLevel === 0 ||
-        (floorPlan as any).floorLevel === 1;
+        floorNumber === 0 ||
+        floorNumber === 1 ||
+        floorLabel.toLowerCase().includes("ground") ||
+        floorLabel.toLowerCase().includes("first");
 
       const template = isGroundFloor
         ? groundFloorAnnotationTemplate
@@ -124,22 +133,22 @@ export const seedMapEditorAnnotations = async () => {
           coordinates: annotationData.coordinates,
           color: annotationData.color,
           isActive: true,
-          createdBy: adminUser._id,
-          updatedBy: adminUser._id,
+          createdBy,
+          updatedBy: createdBy,
         });
         annotationCount++;
       }
 
       console.log(
-        `Created ${template.length} annotations for floor plan: ${(floorPlan as any).floorLabel ?? floorPlan._id}`
+        `✅ Created ${template.length} annotations for floor plan: "${(floorPlan as any).title || floorLabel}"`
       );
     }
 
     console.log(
-      `Map Editor Annotation seeding completed successfully! Total annotations: ${annotationCount}`
+      `\n✨ Map Editor Annotation seeding completed successfully! Total annotations: ${annotationCount}`
     );
   } catch (error) {
-    console.error("Error seeding Map Editor Annotations:", error);
+    console.error("❌ Error seeding Map Editor Annotations:", error);
     throw error;
   }
 };
