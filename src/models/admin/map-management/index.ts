@@ -8,4 +8,6 @@ export { default as MapEditorEntrance } from "./mapEditorEntrance";
 export type { IMapEditorEntrance } from "./mapEditorEntrance";
 export { default as MapManagementSettings } from "./mapSettings";
 export type { IMapManagementSettings } from "./mapSettings";
+export { default as MapEditorPreferences } from "./mapEditorPreferences";
+export type { IMapEditorPreferences } from "./mapEditorPreferences";
 

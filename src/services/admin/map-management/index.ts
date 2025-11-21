@@ -8,4 +8,5 @@ export * from "./mapEditorRestrictedZone";
 export * from "./mapEditorLabel";
 export * from "./mapEditorMeasurement";
 export * from "./mapEditorAnnotation";
+export * from "./mapEditorPreferences";
 export * from "./settings";
