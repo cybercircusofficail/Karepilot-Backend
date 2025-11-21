@@ -5,3 +5,10 @@ export {
   requireAnyPermission,
 } from './auth';
 
+export {
+  NotFound,
+  errorHandler,
+  asyncHandler,
+  handleUnhandledRejection,
+  handleUncaughtException,
+} from './errorHandler';

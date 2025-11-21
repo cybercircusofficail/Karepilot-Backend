@@ -8,8 +8,17 @@ import ExpressMongoSanitize from "express-mongo-sanitize";
 import cookieParser from "cookie-parser";
 import dbConnect from "./config/dbConnect";
 import mainRouter from "./routes/v1";
+import { 
+  NotFound, 
+  errorHandler, 
+  handleUnhandledRejection, 
+  handleUncaughtException 
+} from "./middlewares";
 
 config();
+
+handleUncaughtException();
+handleUnhandledRejection();
 
 const app = express();
 
@@ -92,11 +101,12 @@ dbConnect();
 
 app.use("/api/v1", mainRouter);
 
-app.use((req: Request, res: Response, next: NextFunction) => {
-  const error = new Error("Not Found");
-  next(error);
-});
+app.use(NotFound);
+
+app.use(errorHandler);
 
 app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
+  console.log(`🚀 Server listening on port ${port}`);
+  console.log(`📝 Environment: ${process.env.NODE_ENV || "development"}`);
+  console.log(`🔒 Error handling: Comprehensive mode activated`);
 });
