@@ -12,6 +12,9 @@ import {
   MobileUserStatus,
   UpdateUserSettingsData,
   UserSettings,
+  PasswordResetRequestData,
+  PasswordResetVerifyData,
+  PasswordResetData,
 } from "../../types/mobile/mobileUser";
 
 export class MobileUserService {
@@ -257,6 +260,82 @@ export class MobileUserService {
     await mobileUser.save();
 
     return mobileUser.settings;
+  }
+
+  async requestPasswordReset(data: PasswordResetRequestData): Promise<VerificationResponse> {
+    const mobileUser = await MobileUser.findOne({ email: data.email }).select(
+      "+passwordResetCode +passwordResetExpires",
+    );
+    
+    if (!mobileUser) {
+      throw new Error("If an account exists with this email, a password reset code has been sent");
+    }
+
+    if (!mobileUser.isEmailVerified) {
+      throw new Error("Please verify your email before resetting password");
+    }
+
+    const resetCode = mobileUser.generatePasswordResetCode();
+    await mobileUser.save();
+
+    const emailSent = await emailService.sendPasswordReset(
+      {
+        fullName: mobileUser.fullName,
+        resetCode: resetCode,
+      },
+      data.email,
+    );
+
+    if (!emailSent) {
+      throw new Error("Failed to send password reset email. Please try again.");
+    }
+
+    return { email: mobileUser.email };
+  }
+
+  async verifyPasswordResetCode(data: PasswordResetVerifyData): Promise<{ verified: boolean; resetToken: string }> {
+    const mobileUser = await MobileUser.findOne({
+      passwordResetCode: data.code,
+      passwordResetExpires: { $gt: new Date() },
+    }).select("+passwordResetCode +passwordResetExpires +passwordResetToken +passwordResetTokenExpires");
+
+    if (!mobileUser) {
+      throw new Error("Invalid or expired reset code");
+    }
+
+    if (!mobileUser.isPasswordResetCodeValid(data.code)) {
+      throw new Error("Invalid or expired reset code");
+    }
+
+    const resetToken = mobileUser.generatePasswordResetToken();
+    mobileUser.passwordResetCode = undefined;
+    mobileUser.passwordResetExpires = undefined;
+    await mobileUser.save();
+
+    return { verified: true, resetToken };
+  }
+
+  async resetPassword(userId: string, data: PasswordResetData): Promise<void> {
+    const mobileUser = await MobileUser.findById(userId).select(
+      "+password +passwordResetToken +passwordResetTokenExpires",
+    );
+
+    if (!mobileUser) {
+      throw new Error("User not found");
+    }
+
+    if (!mobileUser.passwordResetToken || !mobileUser.passwordResetTokenExpires) {
+      throw new Error("No active password reset session");
+    }
+
+    if (mobileUser.passwordResetTokenExpires <= new Date()) {
+      throw new Error("Reset token has expired");
+    }
+
+    mobileUser.password = data.newPassword;
+    mobileUser.passwordResetToken = undefined;
+    mobileUser.passwordResetTokenExpires = undefined;
+    await mobileUser.save();
   }
 }
 

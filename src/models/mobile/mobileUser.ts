@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import * as bcrypt from "bcryptjs";
+import * as crypto from "crypto";
 import { IMobileUser, MobileUserStatus } from "../../types/mobile/mobileUser";
 
 const mobileUserSchema = new Schema<IMobileUser>(
@@ -33,6 +34,22 @@ const mobileUserSchema = new Schema<IMobileUser>(
       select: false,
     },
     emailVerificationExpires: {
+      type: Date,
+      select: false,
+    },
+    passwordResetCode: {
+      type: String,
+      select: false,
+    },
+    passwordResetExpires: {
+      type: Date,
+      select: false,
+    },
+    passwordResetToken: {
+      type: String,
+      select: false,
+    },
+    passwordResetTokenExpires: {
       type: Date,
       select: false,
     },
@@ -111,6 +128,10 @@ const mobileUserSchema = new Schema<IMobileUser>(
           password,
           emailVerificationCode,
           emailVerificationExpires,
+          passwordResetCode,
+          passwordResetExpires,
+          passwordResetToken,
+          passwordResetTokenExpires,
           ...userWithoutSensitive
         } = ret;
         return userWithoutSensitive;
@@ -151,6 +172,36 @@ mobileUserSchema.methods.isEmailVerificationCodeValid = function (code: string):
     this.emailVerificationCode === code &&
     this.emailVerificationExpires &&
     this.emailVerificationExpires > new Date()
+  );
+};
+
+mobileUserSchema.methods.generatePasswordResetCode = function (): string {
+  const code = Math.floor(1000 + Math.random() * 9000).toString();
+  this.passwordResetCode = code;
+  this.passwordResetExpires = new Date(Date.now() + 10 * 60 * 1000);
+  return code;
+};
+
+mobileUserSchema.methods.isPasswordResetCodeValid = function (code: string): boolean {
+  return (
+    this.passwordResetCode === code &&
+    this.passwordResetExpires &&
+    this.passwordResetExpires > new Date()
+  );
+};
+
+mobileUserSchema.methods.generatePasswordResetToken = function (): string {
+  const token = crypto.randomBytes(32).toString('hex');
+  this.passwordResetToken = token;
+  this.passwordResetTokenExpires = new Date(Date.now() + 15 * 60 * 1000); 
+  return token;
+};
+
+mobileUserSchema.methods.isPasswordResetTokenValid = function (token: string): boolean {
+  return (
+    this.passwordResetToken === token &&
+    this.passwordResetTokenExpires &&
+    this.passwordResetTokenExpires > new Date()
   );
 };
 

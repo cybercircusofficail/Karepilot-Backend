@@ -232,3 +232,63 @@ export const updateUserSettings = async (req: Request, res: Response): Promise<v
   }
 };
 
+export const requestPasswordReset = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { email } = req.body;
+
+    const result = await mobileUserService.requestPasswordReset({ email });
+
+    res.status(200).json({
+      success: true,
+      message: "Password reset code sent to your email",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      message: error.message || "Error sending password reset code",
+    });
+  }
+};
+
+export const verifyPasswordResetCode = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { code } = req.body;
+
+    const result = await mobileUserService.verifyPasswordResetCode({ code });
+
+    res.status(200).json({
+      success: true,
+      message: "Reset code verified successfully",
+      data: {
+        verified: result.verified,
+        resetToken: result.resetToken,
+      },
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      message: error.message || "Invalid or expired reset code",
+    });
+  }
+};
+
+export const resetPassword = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = (req as any).user._id.toString();
+    const { newPassword } = req.body;
+
+    await mobileUserService.resetPassword(userId, { newPassword });
+
+    res.status(200).json({
+      success: true,
+      message: "Password reset successfully. You can now login with your new password.",
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      message: error.message || "Error resetting password",
+    });
+  }
+};
+

@@ -14,6 +14,10 @@ export interface IMobileUser extends Document {
   isEmailVerified: boolean;
   emailVerificationCode?: string | undefined;
   emailVerificationExpires?: Date | undefined;
+  passwordResetCode?: string | undefined;
+  passwordResetExpires?: Date | undefined;
+  passwordResetToken?: string | undefined;
+  passwordResetTokenExpires?: Date | undefined;
   status: MobileUserStatus;
   profileImage?: string;
   lastLogin?: Date | undefined;
@@ -24,6 +28,10 @@ export interface IMobileUser extends Document {
   comparePassword(candidatePassword: string): Promise<boolean>;
   generateEmailVerificationCode(): string;
   isEmailVerificationCodeValid(code: string): boolean;
+  generatePasswordResetCode(): string;
+  isPasswordResetCodeValid(code: string): boolean;
+  generatePasswordResetToken(): string;
+  isPasswordResetTokenValid(token: string): boolean;
 }
 
 export interface CreateMobileUserData {
@@ -88,5 +96,17 @@ export interface UpdateUserSettingsData {
   navigationPreferences?: Partial<NavigationPreferences>;
   languageAndVoice?: Partial<LanguageAndVoice>;
   accessibility?: Partial<AccessibilitySettings>;
+}
+
+export interface PasswordResetRequestData {
+  email: string;
+}
+
+export interface PasswordResetVerifyData {
+  code: string;
+}
+
+export interface PasswordResetData {
+  newPassword: string;
 }
 

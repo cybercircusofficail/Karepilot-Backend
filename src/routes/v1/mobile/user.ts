@@ -9,8 +9,11 @@ import {
   changeMobilePassword,
   getUserSettings,
   updateUserSettings,
+  requestPasswordReset,
+  verifyPasswordResetCode,
+  resetPassword,
 } from "../../../controllers/mobile/mobileUser";
-import { authenticateMobile } from "../../../middlewares/auth";
+import { authenticateMobile, authenticatePasswordReset } from "../../../middlewares/auth";
 import {
   mobileUserRegistrationSchema,
   mobileUserLoginSchema,
@@ -19,6 +22,9 @@ import {
   emailVerificationSchema,
   resendVerificationSchema,
   userSettingsSchema,
+  passwordResetRequestSchema,
+  passwordResetVerifySchema,
+  passwordResetSchema,
 } from "../../../validations/mobile/mobileUser";
 import { validate } from "../../../utils";
 
@@ -35,6 +41,25 @@ mobileRouter.post(
 );
 
 mobileRouter.post("/login", validate(mobileUserLoginSchema), loginMobileUser);
+
+mobileRouter.post(
+  "/forgot-password",
+  validate(passwordResetRequestSchema),
+  requestPasswordReset,
+);
+
+mobileRouter.post(
+  "/verify-reset-code",
+  validate(passwordResetVerifySchema),
+  verifyPasswordResetCode,
+);
+
+mobileRouter.post(
+  "/reset-password",
+  authenticatePasswordReset,
+  validate(passwordResetSchema),
+  resetPassword,
+);
 
 mobileRouter.use(authenticateMobile);
 

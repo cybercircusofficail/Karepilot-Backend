@@ -125,3 +125,56 @@ export const requireAnyPermission = (permissions: (keyof IPermission)[]) => {
     next();
   };
 };
+
+export const authenticatePasswordReset = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    let resetToken = req.header("Authorization")?.replace("Bearer ", "");
+
+    if (!resetToken) {
+      resetToken = req.cookies?.["reset-token"] || null;
+    }
+
+    if (!resetToken) {
+      res.status(401).json({
+        success: false,
+        message: "Access denied. No reset token provided.",
+      });
+      return;
+    }
+
+    const mobileUser = await MobileUser.findOne({
+      passwordResetToken: resetToken,
+      passwordResetTokenExpires: { $gt: new Date() },
+    }).select("+passwordResetToken +passwordResetTokenExpires");
+
+    if (!mobileUser) {
+      res.status(401).json({
+        success: false,
+        message: "Invalid or expired reset token.",
+      });
+      return;
+    }
+
+    if (!mobileUser.isPasswordResetTokenValid(resetToken)) {
+      res.status(401).json({
+        success: false,
+        message: "Invalid or expired reset token.",
+      });
+      return;
+    }
+
+    req.user = mobileUser;
+    req.userType = "mobile";
+    (req as any).resetToken = resetToken;
+    next();
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      message: "Invalid reset token.",
+    });
+  }
+};

@@ -127,3 +127,34 @@ export const userSettingsSchema = Joi.object({
   'object.min': 'At least one settings field must be provided'
 });
 
+export const passwordResetRequestSchema = Joi.object({
+  email: emailSchema
+});
+
+export const passwordResetVerifySchema = Joi.object({
+  code: Joi.string()
+    .length(4)
+    .pattern(/^\d{4}$/)
+    .required()
+    .messages({
+      'string.length': 'Reset code must be exactly 4 digits',
+      'string.pattern.base': 'Reset code must contain only numbers',
+      'any.required': 'Reset code is required'
+    })
+});
+
+export const passwordResetSchema = Joi.object({
+  newPassword: passwordSchema.messages({
+    'string.min': 'New password must be at least 8 characters long',
+    'string.pattern.base': 'New password must contain at least 8 characters, including uppercase, lowercase, numbers, and special characters',
+    'any.required': 'New password is required'
+  }),
+  confirmPassword: Joi.string()
+    .valid(Joi.ref('newPassword'))
+    .required()
+    .messages({
+      'any.only': 'Passwords do not match',
+      'any.required': 'Password confirmation is required'
+    })
+});
+
